@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="/static/bootstrap/jquery.js"></script>
+  <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css" />
+  <script src="/static/bootstrap/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="/static/bootstrap/themes/cerulean.min.css" />
+  <link rel="stylesheet" type="text/css" href="/static/bootstrap/themes/custom.css" />
+  <title>Tanka/Haiku Finder</title>
+</head>
+
+<body>
+<div class="container">
+
+<div class="page-header">
+  <h1>Tanka / Haiku Finder</h1>
+</div>
+
+<h3 class="heading">入力</h3>
+
+探すのは
+<select name="type" id="type" class="form-control">
+  <option value="TANKA" SELECTED>短歌</options>
+  <option value="HAIKU">俳句</options>
+</select>
+
+短歌/俳句を探したい文章を貼り付けてください<br/>
+<textarea name="txt" id="txt" class="form-control" style="height: 300px;">
+</textarea>
+
+<h3 class="heading">結果</h3>
+
+<div id="result">
+</div>
+
+</div>
+
+<script>
+var previousText = "";
+
+function findTanka () {
+  var currentText = $("#txt").val();
+  if (currentText == previousText) {
+    setTimeout(findTanka, 500);
+    return false;
+  }
+
+  $.ajax({
+    type: "POST",
+    url: "/api",
+    data: {txt: currentText, syllable_pattern: $("#type").val()},
+    dataType: "json",
+    success: function(data) {
+      var resultDiv = $("#result");
+      resultDiv.empty();
+      if (data.length == 0) {
+        previousText = currentText;
+        setTimeout(findTanka, 500);
+        return false;
+      }
+
+      var bestScore = data[0][2];
+      var goodList = [];
+      var badList = [];
+      for (var i=0; data[i]; i++) {
+        var l = $("<li>")
+        l.append(data[i][0].join(" / "));
+        l.append($("<br>"));
+        l.append(data[i][1].join(" / "));
+        if (data[i][2] == bestScore) {
+          goodList.push(l);
+        } else {
+          badList.push(l);
+        }
+      }
+
+      console.log(goodList);
+      console.log(badList);
+      resultDiv.append("良さそう");
+      var goodUl = $("<ul>");
+      for (var i=0; goodList[i]; i++) {
+        goodUl.append(goodList[i]);
+      }
+      resultDiv.append(goodUl);
+      if (badList.length != 0) {
+        resultDiv.append("うーん");
+        var badUl = $("<ul>");
+        for (var i=0; badList[i]; i++) {
+          badUl.append(badList[i]);
+        }
+        resultDiv.append(badUl);
+      }
+
+      previousText = currentText;
+      setTimeout(findTanka, 500);
+    }
+  });
+}
+
+findTanka();
+</script>
+</body>
+
+
+</html>
