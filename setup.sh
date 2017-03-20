@@ -9,3 +9,4 @@ sudo apt-get install mecab libmecab-dev mecab-ipadic mecab-ipadic-utf8 virtualen
 virtualenv --python=$(which python3) .venv
 . .venv/bin/activate
 pip install wheezy.web gunicorn mecab-python3
+mkdir logs
