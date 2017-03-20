@@ -27,8 +27,8 @@ def read_int(numbers):
     if numbers == '0':
         return [('0', '名詞', '数', 'ゼロ')]
 
-    max_digit = len(numbers.replace(',', '')
-    )# 桁数が大きすぎる場合は読むのを諦めて空の配列を返す
+    max_digit = len(numbers.replace(',', ''))
+    # 桁数が大きすぎる場合は読むのを諦めて空の配列を返す
     if max_digit > len(ONETIME_DIGIT_SUFFIXES) * 4:
         return []
 
